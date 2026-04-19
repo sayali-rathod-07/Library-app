@@ -92,6 +92,14 @@ export const LibraryProvider = ({ children }) => {
 
     // --- STUDENT MANAGEMENT ---
     const [students, setStudents] = useState(() => {
+        // Force cleanup of old demo data
+        if (!localStorage.getItem('lib_cleaned_v2')) {
+            localStorage.removeItem('lib_students');
+            localStorage.removeItem('lib_issues');
+            localStorage.setItem('lib_cleaned_v2', 'true');
+            return [];
+        }
+
         const saved = localStorage.getItem('lib_students');
         const parsed = saved ? JSON.parse(saved) : [];
         return parsed;
