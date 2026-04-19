@@ -41,8 +41,12 @@ export const LibraryProvider = ({ children }) => {
                     id: '1',
                     title: 'The Great Gatsby',
                     author: 'F. Scott Fitzgerald',
-                    thumbnail: 'https://books.google.com/books/content?id=iXn5U2uR_L8C&printsec=frontcover&img=1&zoom=1',
+                    thumbnail: 'https://books.google.com/books/content?id=iXn5U2uR_L8C&printsec=frontcover&img=1&zoom=2',
                     isbn: '9780743273565',
+                    description: 'The Great Gatsby is a 1925 novel by American writer F. Scott Fitzgerald.',
+                    categories: ['Fiction'],
+                    pageCount: 180,
+                    publishedDate: '1925',
                     total: 10,
                     available: 10
                 },
@@ -50,8 +54,12 @@ export const LibraryProvider = ({ children }) => {
                     id: '2',
                     title: 'To Kill a Mockingbird',
                     author: 'Harper Lee',
-                    thumbnail: 'https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1',
+                    thumbnail: 'https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=2',
                     isbn: '9780061120084',
+                    description: 'To Kill a Mockingbird is a novel by Harper Lee published in 1960.',
+                    categories: ['Fiction'],
+                    pageCount: 281,
+                    publishedDate: '1960',
                     total: 12,
                     available: 12
                 },
@@ -59,8 +67,12 @@ export const LibraryProvider = ({ children }) => {
                     id: '3',
                     title: '1984',
                     author: 'George Orwell',
-                    thumbnail: 'https://books.google.com/books/content?id=kotPYEqx7mcC&printsec=frontcover&img=1&zoom=1',
+                    thumbnail: 'https://books.google.com/books/content?id=kotPYEqx7mcC&printsec=frontcover&img=1&zoom=2',
                     isbn: '9780451524935',
+                    description: '1984 is a dystopian social science fiction novel by English novelist George Orwell.',
+                    categories: ['Fiction'],
+                    pageCount: 328,
+                    publishedDate: '1949',
                     total: 8,
                     available: 8
                 }
@@ -89,14 +101,20 @@ export const LibraryProvider = ({ children }) => {
 
         const fetchInitialBooks = async () => {
             try {
-                const queries = ['indian+authors+famous+books', 'indian+literature+classics'];
+                const queries = [
+                    'indian+classics+literature',
+                    'famous+indian+authors+novels',
+                    'international+bestsellers+fiction',
+                    'classic+world+literature',
+                    'contemporary+indian+fiction'
+                ];
+
                 let allBooks = [];
                 for (const q of queries) {
                     const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=20`);
                     const data = await res.json();
                     const formatted = data.items?.map(item => {
                         const info = item.volumeInfo;
-                        // Improve image quality by requesting zoom=2 and forcing https
                         const thumb = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || 'https://via.placeholder.com/128x192?text=No+Cover';
                         const highResThumb = thumb.replace('zoom=1', 'zoom=2').replace('http://', 'https://');
 
