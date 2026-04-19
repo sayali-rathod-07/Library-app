@@ -140,6 +140,13 @@ export const LibraryProvider = ({ children }) => {
         setStudents(prev => prev.map(s => s.id === studentId ? { ...s, ...updatedData } : s));
     };
 
+    const deleteStudent = (studentId) => {
+        // Remove the student
+        setStudents(prev => prev.filter(s => s.id !== studentId));
+        // Remove all issues associated with this student
+        setIssues(prev => prev.filter(i => i.studentId !== studentId));
+    };
+
     const getDueSoon = () => {
         return issues
             .filter(i => i.status === 'issued')
@@ -160,6 +167,7 @@ export const LibraryProvider = ({ children }) => {
         issueBook,
         returnBook,
         updateStudent,
+        deleteStudent,
         getDueSoon,
         resetData,
         setBooks,

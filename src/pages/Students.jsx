@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
 import { useLibrary } from '../context/LibraryContext';
 import { useNotification } from '../context/NotificationContext';
-import { User, Mail, Hash, Layers, Phone, MessageCircle, Edit2, Check, X } from 'lucide-react';
+import { User, Mail, Hash, Layers, Phone, MessageCircle, Edit2, Check, X, Trash2 } from 'lucide-react';
 import './Students.css';
 
-const StudentCard = ({ student, issues, books, onUpdate }) => {
+const StudentCard = ({ student, issues, books, onUpdate, onDelete }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({ ...student });
     const { showNotification } = useNotification();
@@ -76,7 +75,15 @@ const StudentCard = ({ student, issues, books, onUpdate }) => {
                             <button className="action-btn cancel" onClick={() => { setIsEditing(false); setEditData({ ...student }); }}><X size={18} /></button>
                         </>
                     ) : (
-                        <button className="action-btn edit" onClick={() => setIsEditing(true)}><Edit2 size={18} /></button>
+                        <>
+                            <button className="action-btn edit" onClick={() => setIsEditing(true)}><Edit2 size={18} /></button>
+                            <button className="action-btn delete" onClick={() => {
+                                if (window.confirm(`Are you sure you want to delete ${student.name}? This will also remove all their book records.`)) {
+                                    onDelete(student.id);
+                                    showNotification(`${student.name} and their records have been deleted.`, 'info');
+                                }
+                            }}><Trash2 size={18} /></button>
+                        </>
                     )}
                 </div>
             </div>
@@ -156,7 +163,7 @@ const StudentCard = ({ student, issues, books, onUpdate }) => {
 };
 
 const Students = () => {
-    const { students, issues, books, searchQuery, updateStudent } = useLibrary();
+    const { students, issues, books, searchQuery, updateStudent, deleteStudent } = useLibrary();
 
     // We filter the students first based on the search query
     const filteredStudents = students.filter(student =>
@@ -203,6 +210,7 @@ const Students = () => {
                         issues={issues}
                         books={books}
                         onUpdate={updateStudent}
+                        onDelete={deleteStudent}
                     />
                 ))}
             </div>
