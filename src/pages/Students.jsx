@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useLibrary } from '../context/LibraryContext';
 import { useNotification } from '../context/NotificationContext';
 import { User, Mail, Hash, Layers, Phone, MessageCircle, Edit2, Check, X, Trash2 } from 'lucide-react';
