@@ -18,6 +18,17 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  // One-time cleanup of demo data
+  React.useEffect(() => {
+    const hasCleaned = localStorage.getItem('lib_cleaned_v1');
+    if (!hasCleaned) {
+      localStorage.removeItem('lib_students');
+      localStorage.removeItem('lib_issues');
+      localStorage.setItem('lib_cleaned_v1', 'true');
+      window.location.reload();
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <NotificationProvider>
