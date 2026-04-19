@@ -384,3 +384,7 @@
 .reset-btn:hover svg {
     transform: rotate(180deg);
 }
+
+.search-bar-placeholder {
+    flex: 1;
+}

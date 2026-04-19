@@ -59,15 +59,19 @@ const Layout = ({ children }) => {
             </aside>
             <main className="main-content">
                 <header className="top-bar">
-                    <div className="search-bar">
-                        <Search size={18} className="search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search books, students..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
+                    {location.pathname !== '/' ? (
+                        <div className="search-bar">
+                            <Search size={18} className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search books, students..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                    ) : (
+                        <div className="search-bar-placeholder"></div>
+                    )}
                     <div className="user-profile-container">
                         <div className="user-profile" onClick={() => setShowProfile(!showProfile)}>
                             <div className="avatar">{user?.name?.substring(0, 2).toUpperCase()}</div>
