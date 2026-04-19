@@ -540,3 +540,21 @@
     height: 100%;
     object-fit: cover;
 }
+.delete-btn-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: rgba(239, 68, 68, 0.05);
+    color: var(--error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-btn-small:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--error);
+    transform: scale(1.05);
+}

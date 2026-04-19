@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLibrary } from '../context/LibraryContext';
 import { useNotification } from '../context/NotificationContext';
 import confetti from 'canvas-confetti';
-import { Search, Plus, Book as BookIcon, Loader, Info, X as CloseIcon, Calendar, BookOpen as PagesIcon, Tag } from 'lucide-react';
+import { Search, Plus, Book as BookIcon, Loader, Info, X as CloseIcon, Calendar, BookOpen as PagesIcon, Tag, Trash2 } from 'lucide-react';
 import './Books.css';
 
 const Books = () => {
     // We pull in our library data and the issue function from our global context
-    const { books, issueBook, addBook, searchQuery, setBooks } = useLibrary();
+    const { books, issueBook, addBook, deleteBook, searchQuery, setBooks } = useLibrary();
     const { showNotification } = useNotification();
 
     // Local state for handling the search and pagination
@@ -214,7 +214,13 @@ const Books = () => {
                 {filteredBooks.map((book, index) => {
                     const handlers = {
                         onIssue: () => { setSelectedBook(book); setShowIssueModal(true); },
-                        onViewDetails: () => { setSelectedBook(book); setShowDetailsModal(true); }
+                        onViewDetails: () => { setSelectedBook(book); setShowDetailsModal(true); },
+                        onDelete: () => {
+                            if (window.confirm(`Are you sure you want to delete "${book.title}"? This will also remove all issue records for this book.`)) {
+                                deleteBook(book.id);
+                                showNotification(`"${book.title}" has been removed from inventory.`, 'info');
+                            }
+                        }
                     };
 
                     if (filteredBooks.length === index + 1) {
@@ -511,7 +517,7 @@ const Books = () => {
     );
 };
 
-const BookContent = ({ book, onIssue, onViewDetails }) => (
+const BookContent = ({ book, onIssue, onViewDetails, onDelete }) => (
     <>
         <div className="book-cover">
             <img
@@ -542,6 +548,9 @@ const BookContent = ({ book, onIssue, onViewDetails }) => (
                 </button>
                 <button className="info-btn" onClick={onViewDetails}>
                     <Info size={16} /> Details
+                </button>
+                <button className="delete-btn-small" onClick={onDelete}>
+                    <Trash2 size={16} />
                 </button>
             </div>
         </div>

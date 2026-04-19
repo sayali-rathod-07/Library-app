@@ -176,6 +176,11 @@ export const LibraryProvider = ({ children }) => {
         setBooks(prev => [newBook, ...prev]);
     };
 
+    const deleteBook = (bookId) => {
+        setBooks(prev => prev.filter(b => b.id !== bookId));
+        setIssues(prev => prev.filter(i => i.bookId !== bookId));
+    };
+
     const value = {
         books,
         students,
@@ -185,6 +190,7 @@ export const LibraryProvider = ({ children }) => {
         updateStudent,
         deleteStudent,
         addBook,
+        deleteBook,
         getDueSoon,
         resetData,
         setBooks,
