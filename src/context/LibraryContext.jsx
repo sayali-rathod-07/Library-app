@@ -98,7 +98,7 @@ export const LibraryProvider = ({ children }) => {
                         id: item.id,
                         title: item.volumeInfo.title,
                         author: item.volumeInfo.authors?.[0] || 'Unknown Author',
-                        thumbnail: item.volumeInfo.imageLinks?.thumbnail || 'https://via.placeholder.com/128x192?text=No+Cover',
+                        thumbnail: (item.volumeInfo.imageLinks?.thumbnail || 'https://via.placeholder.com/128x192?text=No+Cover').replace('http://', 'https://'),
                         isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier || 'N/A',
                         total: 10,
                         available: 10
