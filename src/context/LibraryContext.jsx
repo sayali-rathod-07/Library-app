@@ -9,7 +9,11 @@ export const LibraryProvider = ({ children }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [books, setBooks] = useState(() => {
         const saved = localStorage.getItem('lib_books');
-        if (saved) return JSON.parse(saved);
+        const parsed = saved ? JSON.parse(saved) : [];
+
+        // If we have books in storage, use them. 
+        // Otherwise, load the starter books so the dashboard isn't empty.
+        if (parsed.length > 0) return parsed;
 
         // Starter books to ensure the dashboard looks great on first load
         return [
