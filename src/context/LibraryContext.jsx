@@ -34,50 +34,9 @@ export const LibraryProvider = ({ children }) => {
         const parsedStudents = savedStudents ? JSON.parse(savedStudents) : [];
         const parsedIssues = savedIssues ? JSON.parse(savedIssues) : [];
 
-        // If new user has no books, load starter books
+        // If new user has no books, load an empty array and let the API fetch Indian books
         if (parsedBooks.length === 0) {
-            const starterBooks = [
-                {
-                    id: '1',
-                    title: 'The Great Gatsby',
-                    author: 'F. Scott Fitzgerald',
-                    thumbnail: 'https://books.google.com/books/content?id=iXn5U2uR_L8C&printsec=frontcover&img=1&zoom=2',
-                    isbn: '9780743273565',
-                    description: 'The Great Gatsby is a 1925 novel by American writer F. Scott Fitzgerald.',
-                    categories: ['Fiction'],
-                    pageCount: 180,
-                    publishedDate: '1925',
-                    total: 10,
-                    available: 10
-                },
-                {
-                    id: '2',
-                    title: 'To Kill a Mockingbird',
-                    author: 'Harper Lee',
-                    thumbnail: 'https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=2',
-                    isbn: '9780061120084',
-                    description: 'To Kill a Mockingbird is a novel by Harper Lee published in 1960.',
-                    categories: ['Fiction'],
-                    pageCount: 281,
-                    publishedDate: '1960',
-                    total: 12,
-                    available: 12
-                },
-                {
-                    id: '3',
-                    title: '1984',
-                    author: 'George Orwell',
-                    thumbnail: 'https://books.google.com/books/content?id=kotPYEqx7mcC&printsec=frontcover&img=1&zoom=2',
-                    isbn: '9780451524935',
-                    description: '1984 is a dystopian social science fiction novel by English novelist George Orwell.',
-                    categories: ['Fiction'],
-                    pageCount: 328,
-                    publishedDate: '1949',
-                    total: 8,
-                    available: 8
-                }
-            ];
-            setBooks(starterBooks);
+            setBooks([]);
             setStudents([]);
             setIssues([]);
         } else {
@@ -97,16 +56,27 @@ export const LibraryProvider = ({ children }) => {
 
     // Fetch more books from API
     useEffect(() => {
-        if (!user || books.length > 3) return;
+        if (!user) return;
+
+        // One-time cleanup to switch to Indian-only books
+        const cleanupKey = getStorageKey('indian_only_v1');
+        if (!localStorage.getItem(cleanupKey)) {
+            setBooks([]);
+            localStorage.setItem(cleanupKey, 'true');
+            return;
+        }
+
+        if (books.length > 0) return;
 
         const fetchInitialBooks = async () => {
             try {
                 const queries = [
-                    'indian+classics+literature',
-                    'famous+indian+authors+novels',
-                    'international+bestsellers+fiction',
-                    'classic+world+literature',
-                    'contemporary+indian+fiction'
+                    'indian+literature+classics',
+                    'contemporary+indian+fiction',
+                    'famous+indian+authors',
+                    'indian+history+books',
+                    'indian+mythology+books',
+                    'indian+philosophy+books'
                 ];
 
                 let allBooks = [];
