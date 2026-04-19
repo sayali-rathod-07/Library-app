@@ -63,7 +63,14 @@ const Dashboard = () => {
                                 return (
                                     <div key={issue.id} className={`due-item ${isOverdue ? 'overdue' : ''}`}>
                                         <div className="book-thumb">
-                                            <img src={book?.thumbnail} alt={book?.title} />
+                                            <img
+                                                src={book?.thumbnail}
+                                                alt={book?.title}
+                                                onError={(e) => {
+                                                    e.target.src = 'https://via.placeholder.com/128x192?text=No+Cover';
+                                                    e.target.onerror = null;
+                                                }}
+                                            />
                                         </div>
                                         <div className="due-info">
                                             <h4>{book?.title}</h4>

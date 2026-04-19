@@ -89,7 +89,14 @@ const Issues = () => {
                                     <tr key={issue.id} className={isOverdue ? 'row-overdue' : ''}>
                                         <td>
                                             <div className="book-cell">
-                                                <img src={book?.thumbnail} alt="" />
+                                                <img
+                                                    src={book?.thumbnail}
+                                                    alt=""
+                                                    onError={(e) => {
+                                                        e.target.src = 'https://via.placeholder.com/128x192?text=No+Cover';
+                                                        e.target.onerror = null;
+                                                    }}
+                                                />
                                                 <div>
                                                     <div className="book-title">{book?.title}</div>
                                                     <div className="book-isbn">{book?.isbn}</div>

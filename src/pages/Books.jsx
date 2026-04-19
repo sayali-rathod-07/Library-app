@@ -257,7 +257,14 @@ const Books = () => {
 const BookContent = ({ book, onIssue }) => (
     <>
         <div className="book-cover">
-            <img src={book.thumbnail} alt={book.title} />
+            <img
+                src={book.thumbnail}
+                alt={book.title}
+                onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/128x192?text=No+Cover';
+                    e.target.onerror = null; // Prevent infinite loop
+                }}
+            />
         </div>
         <div className="book-details">
             <h3>{book.title}</h3>
