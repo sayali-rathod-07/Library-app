@@ -1,0 +1,99 @@
+.login-page {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    padding: 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.login-header .logo-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+}
+
+.login-header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 8px;
+}
+
+.login-header p {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.error-msg {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+}
+
+.login-footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.login-footer code {
+    display: block;
+    margin-top: 4px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 4px;
+}
+.forgot-link {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.forgot-link button {
+    background: transparent;
+    color: var(--primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.forgot-link button:hover {
+    text-decoration: underline;
+}
+
+.back-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: var(--surface);
+    color: var(--text-main);
+}
