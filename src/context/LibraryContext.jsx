@@ -166,6 +166,16 @@ export const LibraryProvider = ({ children }) => {
         window.location.reload();
     };
 
+    const addBook = (bookData) => {
+        const newBook = {
+            ...bookData,
+            id: `manual_${Date.now()}`,
+            available: bookData.total,
+            thumbnail: bookData.thumbnail || 'https://via.placeholder.com/128x192?text=New+Book'
+        };
+        setBooks(prev => [newBook, ...prev]);
+    };
+
     const value = {
         books,
         students,
@@ -174,6 +184,7 @@ export const LibraryProvider = ({ children }) => {
         returnBook,
         updateStudent,
         deleteStudent,
+        addBook,
         getDueSoon,
         resetData,
         setBooks,

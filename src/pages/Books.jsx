@@ -7,7 +7,7 @@ import './Books.css';
 
 const Books = () => {
     // We pull in our library data and the issue function from our global context
-    const { books, issueBook, searchQuery, setBooks } = useLibrary();
+    const { books, issueBook, addBook, searchQuery, setBooks } = useLibrary();
     const { showNotification } = useNotification();
 
     // Local state for handling the search and pagination
@@ -16,6 +16,7 @@ const Books = () => {
     const [loading, setLoading] = useState(false);
     const [showIssueModal, setShowIssueModal] = useState(false);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -31,6 +32,18 @@ const Books = () => {
         phone: '',
         email: '',
         days: 7
+    });
+
+    const [bookForm, setBookForm] = useState({
+        title: '',
+        author: '',
+        categories: ['Fiction'],
+        publishedDate: '',
+        pageCount: '',
+        isbn: '',
+        description: '',
+        total: 10,
+        thumbnail: ''
     });
 
     // This clever bit of code detects when the very last book on the page is visible,
@@ -141,11 +154,32 @@ const Books = () => {
         });
     };
 
+    const handleManualAdd = (e) => {
+        e.preventDefault();
+        addBook(bookForm);
+        setShowAddModal(false);
+        setBookForm({
+            title: '',
+            author: '',
+            categories: ['Fiction'],
+            publishedDate: '',
+            pageCount: '',
+            isbn: '',
+            description: '',
+            total: 10,
+            thumbnail: ''
+        });
+        showNotification(`Book "${bookForm.title}" added to inventory!`, 'success');
+    };
+
     return (
         <div className="books-page">
             <header className="page-header">
                 <h1>Book Inventory</h1>
                 <div className="header-actions">
+                    <button className="add-book-btn" onClick={() => setShowAddModal(true)}>
+                        <Plus size={18} /> Add New Book
+                    </button>
                     <form className="search-form" onSubmit={searchBooks}>
                         <Search size={18} />
                         <input
@@ -336,6 +370,114 @@ const Books = () => {
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {showAddModal && (
+                <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+                    <div className="modal-content glass-card" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Add New Book to Inventory</h2>
+                            <button className="close-btn" onClick={() => setShowAddModal(false)}><CloseIcon size={20} /></button>
+                        </div>
+                        <form className="issue-form" onSubmit={handleManualAdd}>
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label>Book Title</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="Enter book title"
+                                        value={bookForm.title}
+                                        onChange={e => setBookForm({ ...bookForm, title: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Author Name</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="Enter author name"
+                                        value={bookForm.author}
+                                        onChange={e => setBookForm({ ...bookForm, author: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Category / Tag</label>
+                                    <select
+                                        value={bookForm.categories[0]}
+                                        onChange={e => setBookForm({ ...bookForm, categories: [e.target.value] })}
+                                    >
+                                        <option value="Fiction">Fiction</option>
+                                        <option value="Non-Fiction">Non-Fiction</option>
+                                        <option value="History">History</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Philosophy">Philosophy</option>
+                                        <option value="Mythology">Mythology</option>
+                                        <option value="Biography">Biography</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Publish Date</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. 2024"
+                                        value={bookForm.publishedDate}
+                                        onChange={e => setBookForm({ ...bookForm, publishedDate: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Page Count</label>
+                                    <input
+                                        type="number"
+                                        placeholder="e.g. 350"
+                                        value={bookForm.pageCount}
+                                        onChange={e => setBookForm({ ...bookForm, pageCount: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>ISBN Number</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter ISBN"
+                                        value={bookForm.isbn}
+                                        onChange={e => setBookForm({ ...bookForm, isbn: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Total Copies</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        min="1"
+                                        value={bookForm.total}
+                                        onChange={e => setBookForm({ ...bookForm, total: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Cover Image URL (Optional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="https://..."
+                                        value={bookForm.thumbnail}
+                                        onChange={e => setBookForm({ ...bookForm, thumbnail: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group full-width">
+                                <label>Description</label>
+                                <textarea
+                                    placeholder="Enter book description..."
+                                    value={bookForm.description}
+                                    onChange={e => setBookForm({ ...bookForm, description: e.target.value })}
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="btn-secondary" onClick={() => setShowAddModal(false)}>Cancel</button>
+                                <button type="submit" className="btn-primary">Add to Inventory</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
