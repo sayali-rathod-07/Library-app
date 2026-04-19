@@ -59,11 +59,11 @@ export const LibraryProvider = ({ children }) => {
         if (!user) return;
 
         // One-time cleanup to switch to Indian-only books
-        const cleanupKey = getStorageKey('indian_only_v1');
+        const cleanupKey = getStorageKey('indian_only_v3');
         if (!localStorage.getItem(cleanupKey)) {
             setBooks([]);
             localStorage.setItem(cleanupKey, 'true');
-            return;
+            // Continue execution to fetch books
         }
 
         if (books.length > 0) return;
@@ -75,15 +75,16 @@ export const LibraryProvider = ({ children }) => {
                     'contemporary+indian+fiction',
                     'famous+indian+authors',
                     'indian+history+books',
-                    'indian+mythology+books',
-                    'indian+philosophy+books'
+                    'indian+mythology+books'
                 ];
 
                 let allBooks = [];
                 for (const q of queries) {
                     const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=20`);
                     const data = await res.json();
-                    const formatted = data.items?.map(item => {
+                    if (!data.items) continue;
+
+                    const formatted = data.items.map(item => {
                         const info = item.volumeInfo;
                         const thumb = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || 'https://via.placeholder.com/128x192?text=No+Cover';
                         const highResThumb = thumb.replace('zoom=1', 'zoom=2').replace('http://', 'https://');
@@ -101,18 +102,19 @@ export const LibraryProvider = ({ children }) => {
                             total: 10,
                             available: 10
                         };
-                    }) || [];
+                    });
                     allBooks = [...allBooks, ...formatted];
                 }
-                setBooks(prev => {
-                    const combined = [...prev, ...allBooks];
-                    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
-                    return unique.slice(0, 60);
-                });
+
+                if (allBooks.length > 0) {
+                    const unique = Array.from(new Map(allBooks.map(item => [item.id, item])).values());
+                    setBooks(unique.slice(0, 60));
+                }
             } catch (err) {
                 console.error("Failed to fetch initial books:", err);
             }
         };
+
         fetchInitialBooks();
     }, [user?.id, books.length]);
 
