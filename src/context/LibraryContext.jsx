@@ -9,15 +9,47 @@ export const LibraryProvider = ({ children }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [books, setBooks] = useState(() => {
         const saved = localStorage.getItem('lib_books');
-        return saved ? JSON.parse(saved) : [];
+        if (saved) return JSON.parse(saved);
+
+        // Starter books to ensure the dashboard looks great on first load
+        return [
+            {
+                id: '1',
+                title: 'The Great Gatsby',
+                author: 'F. Scott Fitzgerald',
+                thumbnail: 'https://books.google.com/books/content?id=iXn5U2uR_L8C&printsec=frontcover&img=1&zoom=1',
+                isbn: '9780743273565',
+                total: 10,
+                available: 9
+            },
+            {
+                id: '2',
+                title: 'To Kill a Mockingbird',
+                author: 'Harper Lee',
+                thumbnail: 'https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1',
+                isbn: '9780061120084',
+                total: 12,
+                available: 12
+            },
+            {
+                id: '3',
+                title: '1984',
+                author: 'George Orwell',
+                thumbnail: 'https://books.google.com/books/content?id=kotPYEqx7mcC&printsec=frontcover&img=1&zoom=1',
+                isbn: '9780451524935',
+                total: 8,
+                available: 7
+            }
+        ];
     });
 
     useEffect(() => {
         const fetchInitialBooks = async () => {
-            if (books.length > 0) return;
+            const saved = localStorage.getItem('lib_books');
+            // If we already have more than our 3 starter books, don't fetch again
+            if (saved && JSON.parse(saved).length > 3) return;
 
             try {
-                // Fetch from multiple queries to get a diverse set of 50+ books
                 const queries = [
                     'indian+authors+famous+books',
                     'indian+literature+classics',
@@ -40,9 +72,12 @@ export const LibraryProvider = ({ children }) => {
                     allBooks = [...allBooks, ...formatted];
                 }
 
-                // Remove duplicates by ID
-                const uniqueBooks = Array.from(new Map(allBooks.map(item => [item.id, item])).values());
-                setBooks(uniqueBooks.slice(0, 60)); // Get around 60 books
+                setBooks(prev => {
+                    const combined = [...prev, ...allBooks];
+                    // Remove duplicates by ID and limit to 60
+                    const uniqueBooks = Array.from(new Map(combined.map(item => [item.id, item])).values());
+                    return uniqueBooks.slice(0, 60);
+                });
             } catch (err) {
                 console.error("Failed to fetch initial books:", err);
             }
