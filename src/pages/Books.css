@@ -1,0 +1,258 @@
+.books-page {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.header-actions {
+    margin-top: 16px;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 8px 4px 16px;
+    border-radius: 12px;
+    gap: 12px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-form input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    outline: none;
+    font-size: 0.9375rem;
+    color: var(--text-main);
+}
+
+.search-form input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-form button {
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.book-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.book-card:hover {
+    transform: translateY(-4px);
+}
+
+.book-cover {
+    height: 200px;
+    background: #f1f5f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.book-cover img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    padding: 16px;
+}
+
+.book-details {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.book-details h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-main);
+    height: 3.2rem;
+    overflow-y: auto;
+    padding-right: 4px;
+    line-height: 1.2;
+}
+
+.book-details h3::-webkit-scrollbar {
+    width: 4px;
+}
+
+.book-details h3::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.author {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.book-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    margin: 8px 0;
+}
+
+.stock {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.in-stock {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.out-stock {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.issue-btn {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--primary);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.issue-btn:disabled {
+    background: var(--border);
+    cursor: not-allowed;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 500px;
+    padding: 32px;
+    background: var(--surface);
+}
+
+.modal-content h2 {
+    margin-bottom: 8px;
+}
+
+.modal-content p {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.form-group input {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 0;
+    gap: 20px;
+    color: var(--text-muted);
+}
+
+.loading-state p {
+    font-weight: 500;
+    font-size: 1.125rem;
+}
+
+.loading-more {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    gap: 12px;
+    color: var(--text-muted);
+}
+
+.end-message {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-muted);
+    font-weight: 500;
+}
