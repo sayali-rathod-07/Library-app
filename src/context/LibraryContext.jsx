@@ -1,65 +1,95 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { addDays, format, isBefore, parseISO } from 'date-fns';
+import { useAuth } from './AuthContext';
 
 const LibraryContext = createContext();
 
 export const useLibrary = () => useContext(LibraryContext);
 
 export const LibraryProvider = ({ children }) => {
+    const { user } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
-    const [books, setBooks] = useState(() => {
-        const saved = localStorage.getItem('lib_books');
-        const parsed = saved ? JSON.parse(saved) : [];
 
-        // If we have books in storage, use them. 
-        // Otherwise, load the starter books so the dashboard isn't empty.
-        if (parsed.length > 0) return parsed;
+    // Helper to get user-specific storage key
+    const getStorageKey = (key) => user ? `lib_${user.id}_${key}` : null;
 
-        // Starter books to ensure the dashboard looks great on first load
-        return [
-            {
-                id: '1',
-                title: 'The Great Gatsby',
-                author: 'F. Scott Fitzgerald',
-                thumbnail: 'https://books.google.com/books/content?id=iXn5U2uR_L8C&printsec=frontcover&img=1&zoom=1',
-                isbn: '9780743273565',
-                total: 10,
-                available: 9
-            },
-            {
-                id: '2',
-                title: 'To Kill a Mockingbird',
-                author: 'Harper Lee',
-                thumbnail: 'https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1',
-                isbn: '9780061120084',
-                total: 12,
-                available: 12
-            },
-            {
-                id: '3',
-                title: '1984',
-                author: 'George Orwell',
-                thumbnail: 'https://books.google.com/books/content?id=kotPYEqx7mcC&printsec=frontcover&img=1&zoom=1',
-                isbn: '9780451524935',
-                total: 8,
-                available: 7
-            }
-        ];
-    });
+    const [books, setBooks] = useState([]);
+    const [students, setStudents] = useState([]);
+    const [issues, setIssues] = useState([]);
 
+    // Load data when user changes
     useEffect(() => {
+        if (!user) {
+            setBooks([]);
+            setStudents([]);
+            setIssues([]);
+            return;
+        }
+
+        const savedBooks = localStorage.getItem(getStorageKey('books'));
+        const savedStudents = localStorage.getItem(getStorageKey('students'));
+        const savedIssues = localStorage.getItem(getStorageKey('issues'));
+
+        const parsedBooks = savedBooks ? JSON.parse(savedBooks) : [];
+        const parsedStudents = savedStudents ? JSON.parse(savedStudents) : [];
+        const parsedIssues = savedIssues ? JSON.parse(savedIssues) : [];
+
+        // If new user has no books, load starter books
+        if (parsedBooks.length === 0) {
+            const starterBooks = [
+                {
+                    id: '1',
+                    title: 'The Great Gatsby',
+                    author: 'F. Scott Fitzgerald',
+                    thumbnail: 'https://books.google.com/books/content?id=iXn5U2uR_L8C&printsec=frontcover&img=1&zoom=1',
+                    isbn: '9780743273565',
+                    total: 10,
+                    available: 10
+                },
+                {
+                    id: '2',
+                    title: 'To Kill a Mockingbird',
+                    author: 'Harper Lee',
+                    thumbnail: 'https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1',
+                    isbn: '9780061120084',
+                    total: 12,
+                    available: 12
+                },
+                {
+                    id: '3',
+                    title: '1984',
+                    author: 'George Orwell',
+                    thumbnail: 'https://books.google.com/books/content?id=kotPYEqx7mcC&printsec=frontcover&img=1&zoom=1',
+                    isbn: '9780451524935',
+                    total: 8,
+                    available: 8
+                }
+            ];
+            setBooks(starterBooks);
+            setStudents([]);
+            setIssues([]);
+        } else {
+            setBooks(parsedBooks);
+            setStudents(parsedStudents);
+            setIssues(parsedIssues);
+        }
+    }, [user?.id]);
+
+    // Save data when it changes
+    useEffect(() => {
+        if (!user) return;
+        localStorage.setItem(getStorageKey('books'), JSON.stringify(books));
+        localStorage.setItem(getStorageKey('students'), JSON.stringify(students));
+        localStorage.setItem(getStorageKey('issues'), JSON.stringify(issues));
+    }, [books, students, issues, user?.id]);
+
+    // Fetch more books from API
+    useEffect(() => {
+        if (!user || books.length > 3) return;
+
         const fetchInitialBooks = async () => {
-            const saved = localStorage.getItem('lib_books');
-            // If we already have more than our 3 starter books, don't fetch again
-            if (saved && JSON.parse(saved).length > 3) return;
-
             try {
-                const queries = [
-                    'indian+authors+famous+books',
-                    'indian+literature+classics',
-                    'famous+indian+novels'
-                ];
-
+                const queries = ['indian+authors+famous+books', 'indian+literature+classics'];
                 let allBooks = [];
                 for (const q of queries) {
                     const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=20`);
@@ -70,45 +100,22 @@ export const LibraryProvider = ({ children }) => {
                         author: item.volumeInfo.authors?.[0] || 'Unknown Author',
                         thumbnail: item.volumeInfo.imageLinks?.thumbnail || 'https://via.placeholder.com/128x192?text=No+Cover',
                         isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier || 'N/A',
-                        total: Math.floor(Math.random() * 10) + 5,
-                        available: Math.floor(Math.random() * 5) + 2
+                        total: 10,
+                        available: 10
                     })) || [];
                     allBooks = [...allBooks, ...formatted];
                 }
-
                 setBooks(prev => {
                     const combined = [...prev, ...allBooks];
-                    // Remove duplicates by ID and limit to 60
-                    const uniqueBooks = Array.from(new Map(combined.map(item => [item.id, item])).values());
-                    return uniqueBooks.slice(0, 60);
+                    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+                    return unique.slice(0, 60);
                 });
             } catch (err) {
                 console.error("Failed to fetch initial books:", err);
             }
         };
-
         fetchInitialBooks();
-    }, []);
-
-    // --- STUDENT MANAGEMENT ---
-    const [students, setStudents] = useState(() => {
-        const saved = localStorage.getItem('lib_students');
-        const parsed = saved ? JSON.parse(saved) : [];
-        return parsed;
-    });
-
-    // --- ISSUE TRACKING ---
-    const [issues, setIssues] = useState(() => {
-        const saved = localStorage.getItem('lib_issues');
-        const parsed = saved ? JSON.parse(saved) : [];
-        return parsed;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('lib_books', JSON.stringify(books));
-        localStorage.setItem('lib_students', JSON.stringify(students));
-        localStorage.setItem('lib_issues', JSON.stringify(issues));
-    }, [books, students, issues]);
+    }, [user?.id, books.length]);
 
     const issueBook = (studentData, bookId, days = 7) => {
         const studentId = `s${Date.now()}`;
@@ -131,7 +138,6 @@ export const LibraryProvider = ({ children }) => {
     const returnBook = (issueId) => {
         const issue = issues.find(i => i.id === issueId);
         if (!issue) return;
-
         setIssues(prev => prev.map(i => i.id === issueId ? { ...i, status: 'returned' } : i));
         setBooks(prev => prev.map(b => b.id === issue.bookId ? { ...b, available: b.available + 1 } : b));
     };
@@ -141,9 +147,7 @@ export const LibraryProvider = ({ children }) => {
     };
 
     const deleteStudent = (studentId) => {
-        // Remove the student
         setStudents(prev => prev.filter(s => s.id !== studentId));
-        // Remove all issues associated with this student
         setIssues(prev => prev.filter(i => i.studentId !== studentId));
     };
 
@@ -154,9 +158,10 @@ export const LibraryProvider = ({ children }) => {
     };
 
     const resetData = () => {
-        localStorage.removeItem('lib_books');
-        localStorage.removeItem('lib_students');
-        localStorage.removeItem('lib_issues');
+        if (!user) return;
+        localStorage.removeItem(getStorageKey('books'));
+        localStorage.removeItem(getStorageKey('students'));
+        localStorage.removeItem(getStorageKey('issues'));
         window.location.reload();
     };
 
