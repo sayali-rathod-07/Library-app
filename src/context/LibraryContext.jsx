@@ -91,10 +91,12 @@ export const LibraryProvider = ({ children }) => {
     }, []);
 
     // --- STUDENT MANAGEMENT ---
-    // We keep track of all students who have ever borrowed a book
     const [students, setStudents] = useState(() => {
         const saved = localStorage.getItem('lib_students');
-        return saved ? JSON.parse(saved) : [
+        const parsed = saved ? JSON.parse(saved) : [];
+        if (parsed.length > 0) return parsed;
+
+        return [
             { id: 's1', name: 'Aarav Sharma', rollNo: '101', division: 'A', phone: '9876543210', email: 'aarav@example.com' },
             { id: 's2', name: 'Isha Patel', rollNo: '102', division: 'B', phone: '9123456789', email: 'isha@example.com' },
             { id: 's3', name: 'Rohan Gupta', rollNo: '103', division: 'A', phone: '9988776655', email: 'rohan@example.com' },
@@ -102,16 +104,18 @@ export const LibraryProvider = ({ children }) => {
     });
 
     // --- ISSUE TRACKING ---
-    // This is the core of our library system, tracking which student has which book
     const [issues, setIssues] = useState(() => {
         const saved = localStorage.getItem('lib_issues');
-        return saved ? JSON.parse(saved) : [
+        const parsed = saved ? JSON.parse(saved) : [];
+        if (parsed.length > 0) return parsed;
+
+        return [
             {
                 id: 'i1',
                 studentId: 's1',
                 bookId: '3',
                 issueDate: format(new Date(), 'yyyy-MM-dd'),
-                returnDate: format(addDays(new Date(), -1), 'yyyy-MM-dd'), // This one is overdue!
+                returnDate: format(addDays(new Date(), -1), 'yyyy-MM-dd'), // Overdue
                 status: 'issued'
             },
             {
@@ -119,7 +123,7 @@ export const LibraryProvider = ({ children }) => {
                 studentId: 's2',
                 bookId: '1',
                 issueDate: format(new Date(), 'yyyy-MM-dd'),
-                returnDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'), // Due in a week
+                returnDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'), // Due soon
                 status: 'issued'
             }
         ];
@@ -167,6 +171,13 @@ export const LibraryProvider = ({ children }) => {
             .sort((a, b) => parseISO(a.returnDate) - parseISO(b.returnDate));
     };
 
+    const resetData = () => {
+        localStorage.removeItem('lib_books');
+        localStorage.removeItem('lib_students');
+        localStorage.removeItem('lib_issues');
+        window.location.reload();
+    };
+
     const value = {
         books,
         students,
@@ -175,6 +186,7 @@ export const LibraryProvider = ({ children }) => {
         returnBook,
         updateStudent,
         getDueSoon,
+        resetData,
         setBooks,
         searchQuery,
         setSearchQuery

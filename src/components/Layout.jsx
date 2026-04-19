@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Users, Clock, LogOut, Library, Search } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, Clock, LogOut, Library, Search, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLibrary } from '../context/LibraryContext';
 import './Layout.css';
@@ -8,7 +8,7 @@ import './Layout.css';
 const Layout = ({ children }) => {
     const location = useLocation();
     const { logout, user, updateUser } = useAuth();
-    const { searchQuery, setSearchQuery } = useLibrary();
+    const { searchQuery, setSearchQuery, resetData } = useLibrary();
     const [showProfile, setShowProfile] = React.useState(false);
     const [isEditing, setIsEditing] = React.useState(false);
     const [editData, setEditData] = React.useState({ name: '', phone: '', email: '' });
@@ -123,6 +123,9 @@ const Layout = ({ children }) => {
                                     ) : (
                                         <button className="edit-btn" onClick={() => setIsEditing(true)}>Edit Profile</button>
                                     )}
+                                    <button className="reset-btn" onClick={resetData} title="Clear all local data and reset to default">
+                                        <RefreshCw size={16} /> Reset System
+                                    </button>
                                     <button className="dropdown-logout" onClick={logout}>
                                         <LogOut size={16} /> Sign Out
                                     </button>

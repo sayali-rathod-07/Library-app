@@ -354,3 +354,33 @@
         display: none;
     }
 }
+.reset-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.2);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+}
+
+.reset-btn:hover {
+    background: rgba(255, 152, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.reset-btn svg {
+    transition: transform 0.5s ease;
+}
+
+.reset-btn:hover svg {
+    transform: rotate(180deg);
+}
