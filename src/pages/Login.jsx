@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { LogIn, UserPlus, Mail, Lock, User, ArrowRight } from 'lucide-react';
@@ -9,8 +10,15 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
-    const { login, signup } = useAuth();
+    const { login, signup, user } = useAuth();
     const { showNotification } = useNotification();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
