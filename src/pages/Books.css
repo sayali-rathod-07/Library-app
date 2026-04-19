@@ -167,6 +167,8 @@
     max-width: 500px;
     padding: 32px;
     background: var(--surface);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-content h2 {
@@ -256,6 +258,7 @@
     color: var(--text-muted);
     font-weight: 500;
 }
+
 .book-actions {
     display: flex;
     gap: 10px;
@@ -409,9 +412,11 @@
     .details-grid {
         grid-template-columns: 1fr;
     }
+
     .details-cover {
         padding: 20px;
     }
+
     .details-meta-grid {
         grid-template-columns: 1fr;
     }
