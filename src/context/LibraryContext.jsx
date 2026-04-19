@@ -94,39 +94,14 @@ export const LibraryProvider = ({ children }) => {
     const [students, setStudents] = useState(() => {
         const saved = localStorage.getItem('lib_students');
         const parsed = saved ? JSON.parse(saved) : [];
-        if (parsed.length > 0) return parsed;
-
-        return [
-            { id: 's1', name: 'Aarav Sharma', rollNo: '101', division: 'A', phone: '9876543210', email: 'aarav@example.com' },
-            { id: 's2', name: 'Isha Patel', rollNo: '102', division: 'B', phone: '9123456789', email: 'isha@example.com' },
-            { id: 's3', name: 'Rohan Gupta', rollNo: '103', division: 'A', phone: '9988776655', email: 'rohan@example.com' },
-        ];
+        return parsed;
     });
 
     // --- ISSUE TRACKING ---
     const [issues, setIssues] = useState(() => {
         const saved = localStorage.getItem('lib_issues');
         const parsed = saved ? JSON.parse(saved) : [];
-        if (parsed.length > 0) return parsed;
-
-        return [
-            {
-                id: 'i1',
-                studentId: 's1',
-                bookId: '3',
-                issueDate: format(new Date(), 'yyyy-MM-dd'),
-                returnDate: format(addDays(new Date(), -1), 'yyyy-MM-dd'), // Overdue
-                status: 'issued'
-            },
-            {
-                id: 'i2',
-                studentId: 's2',
-                bookId: '1',
-                issueDate: format(new Date(), 'yyyy-MM-dd'),
-                returnDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'), // Due soon
-                status: 'issued'
-            }
-        ];
+        return parsed;
     });
 
     useEffect(() => {
