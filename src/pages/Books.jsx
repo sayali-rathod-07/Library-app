@@ -76,9 +76,9 @@ const Books = () => {
                 const highResThumb = thumb.replace('zoom=1', 'zoom=2').replace('http://', 'https://');
 
                 return {
-                    id: item.id,
-                    title: info.title,
-                    author: info.authors?.[0] || 'Unknown',
+                    id: item.id || `b${Math.random()}`,
+                    title: info.title || 'Untitled Book',
+                    author: info.authors?.[0] || 'Unknown Author',
                     thumbnail: highResThumb,
                     isbn: info.industryIdentifiers?.[0]?.identifier || 'N/A',
                     description: info.description || 'No description available.',
@@ -112,11 +112,14 @@ const Books = () => {
         fetchMoreBooks(query, page * 20);
     }, [page]);
 
-    const filteredBooks = (searchResults.length > 0 ? searchResults : books).filter(book =>
-        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        book.isbn.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredBooks = (searchResults.length > 0 ? searchResults : books).filter(book => {
+        const title = book.title?.toLowerCase() || '';
+        const author = book.author?.toLowerCase() || '';
+        const isbn = book.isbn?.toLowerCase() || '';
+        const query = searchQuery?.toLowerCase() || '';
+
+        return title.includes(query) || author.includes(query) || isbn.includes(query);
+    });
 
     const searchBooks = async (e) => {
         e.preventDefault();
