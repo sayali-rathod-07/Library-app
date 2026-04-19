@@ -59,7 +59,6 @@ const StudentCard = ({ student, issues, books, onUpdate }) => {
                     ) : (
                         <h3>{student.name}</h3>
                     )}
-                    <p>Student ID: {student.id}</p>
                     {isEditing ? (
                         <input
                             className="edit-input email-input"
