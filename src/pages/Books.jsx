@@ -154,6 +154,17 @@ const Books = () => {
         });
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setBookForm({ ...bookForm, thumbnail: reader.result });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleManualAdd = (e) => {
         e.preventDefault();
         addBook(bookForm);
@@ -455,14 +466,25 @@ const Books = () => {
                                         onChange={e => setBookForm({ ...bookForm, total: parseInt(e.target.value) })}
                                     />
                                 </div>
-                                <div className="form-group">
-                                    <label>Cover Image URL (Optional)</label>
-                                    <input
-                                        type="text"
-                                        placeholder="https://..."
-                                        value={bookForm.thumbnail}
-                                        onChange={e => setBookForm({ ...bookForm, thumbnail: e.target.value })}
-                                    />
+                                <div className="form-group full-width">
+                                    <label>Book Cover Image</label>
+                                    <div className="file-upload-container">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            id="book-cover-upload"
+                                            className="file-input"
+                                        />
+                                        <label htmlFor="book-cover-upload" className="file-label">
+                                            {bookForm.thumbnail ? 'Change Image' : 'Choose Image from Device'}
+                                        </label>
+                                        {bookForm.thumbnail && (
+                                            <div className="image-preview">
+                                                <img src={bookForm.thumbnail} alt="Preview" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className="form-group full-width">
