@@ -94,15 +94,26 @@ export const LibraryProvider = ({ children }) => {
                 for (const q of queries) {
                     const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=20`);
                     const data = await res.json();
-                    const formatted = data.items?.map(item => ({
-                        id: item.id,
-                        title: item.volumeInfo.title,
-                        author: item.volumeInfo.authors?.[0] || 'Unknown Author',
-                        thumbnail: (item.volumeInfo.imageLinks?.thumbnail || 'https://via.placeholder.com/128x192?text=No+Cover').replace('http://', 'https://'),
-                        isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier || 'N/A',
-                        total: 10,
-                        available: 10
-                    })) || [];
+                    const formatted = data.items?.map(item => {
+                        const info = item.volumeInfo;
+                        // Improve image quality by requesting zoom=2 and forcing https
+                        const thumb = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || 'https://via.placeholder.com/128x192?text=No+Cover';
+                        const highResThumb = thumb.replace('zoom=1', 'zoom=2').replace('http://', 'https://');
+
+                        return {
+                            id: item.id,
+                            title: info.title,
+                            author: info.authors?.[0] || 'Unknown Author',
+                            thumbnail: highResThumb,
+                            isbn: info.industryIdentifiers?.[0]?.identifier || 'N/A',
+                            description: info.description || 'No description available.',
+                            categories: info.categories || ['General'],
+                            pageCount: info.pageCount || 'N/A',
+                            publishedDate: info.publishedDate || 'Unknown',
+                            total: 10,
+                            available: 10
+                        };
+                    }) || [];
                     allBooks = [...allBooks, ...formatted];
                 }
                 setBooks(prev => {

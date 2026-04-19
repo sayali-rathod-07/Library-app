@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLibrary } from '../context/LibraryContext';
 import { useNotification } from '../context/NotificationContext';
 import confetti from 'canvas-confetti';
-import { Search, Plus, Book as BookIcon, Loader } from 'lucide-react';
+import { Search, Plus, Book as BookIcon, Loader, Info, X as CloseIcon, Calendar, BookOpen as PagesIcon, Tag } from 'lucide-react';
 import './Books.css';
 
 const Books = () => {
@@ -15,6 +15,7 @@ const Books = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showIssueModal, setShowIssueModal] = useState(false);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -56,15 +57,25 @@ const Books = () => {
                 return;
             }
 
-            const formatted = data.items.map(item => ({
-                id: item.id,
-                title: item.volumeInfo.title,
-                author: item.volumeInfo.authors?.[0] || 'Unknown',
-                thumbnail: (item.volumeInfo.imageLinks?.thumbnail || 'https://via.placeholder.com/128x192?text=No+Cover').replace('http://', 'https://'),
-                isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier || 'N/A',
-                total: 5,
-                available: 5
-            }));
+            const formatted = data.items.map(item => {
+                const info = item.volumeInfo;
+                const thumb = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || 'https://via.placeholder.com/128x192?text=No+Cover';
+                const highResThumb = thumb.replace('zoom=1', 'zoom=2').replace('http://', 'https://');
+
+                return {
+                    id: item.id,
+                    title: info.title,
+                    author: info.authors?.[0] || 'Unknown',
+                    thumbnail: highResThumb,
+                    isbn: info.industryIdentifiers?.[0]?.identifier || 'N/A',
+                    description: info.description || 'No description available.',
+                    categories: info.categories || ['General'],
+                    pageCount: info.pageCount || 'N/A',
+                    publishedDate: info.publishedDate || 'Unknown',
+                    total: 5,
+                    available: 5
+                };
+            });
 
             if (searchTerm) {
                 setSearchResults(prev => [...prev, ...formatted]);
@@ -152,16 +163,21 @@ const Books = () => {
 
             <div className="books-grid">
                 {filteredBooks.map((book, index) => {
+                    const handlers = {
+                        onIssue: () => { setSelectedBook(book); setShowIssueModal(true); },
+                        onViewDetails: () => { setSelectedBook(book); setShowDetailsModal(true); }
+                    };
+
                     if (filteredBooks.length === index + 1) {
                         return (
                             <div ref={lastBookElementRef} key={book.id} className="book-card glass-card">
-                                <BookContent book={book} onIssue={() => { setSelectedBook(book); setShowIssueModal(true); }} />
+                                <BookContent book={book} {...handlers} />
                             </div>
                         );
                     } else {
                         return (
                             <div key={book.id} className="book-card glass-card">
-                                <BookContent book={book} onIssue={() => { setSelectedBook(book); setShowIssueModal(true); }} />
+                                <BookContent book={book} {...handlers} />
                             </div>
                         );
                     }
@@ -250,11 +266,84 @@ const Books = () => {
                     </div>
                 </div>
             )}
+
+            {showDetailsModal && selectedBook && (
+                <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
+                    <div className="modal-content details-modal glass-card" onClick={e => e.stopPropagation()}>
+                        <button className="close-modal" onClick={() => setShowDetailsModal(false)}>
+                            <CloseIcon size={24} />
+                        </button>
+
+                        <div className="details-grid">
+                            <div className="details-cover">
+                                <img
+                                    src={selectedBook.thumbnail}
+                                    alt={selectedBook.title}
+                                    onError={(e) => {
+                                        e.target.src = 'https://via.placeholder.com/128x192?text=No+Cover';
+                                        e.target.onerror = null;
+                                    }}
+                                />
+                            </div>
+                            <div className="details-info">
+                                <h1>{selectedBook.title}</h1>
+                                <p className="details-author">by {selectedBook.author}</p>
+
+                                <div className="details-tags">
+                                    {selectedBook.categories.map(cat => (
+                                        <span key={cat} className="tag"><Tag size={14} /> {cat}</span>
+                                    ))}
+                                </div>
+
+                                <div className="details-meta-grid">
+                                    <div className="meta-box">
+                                        <Calendar size={18} />
+                                        <div>
+                                            <label>Published</label>
+                                            <span>{selectedBook.publishedDate}</span>
+                                        </div>
+                                    </div>
+                                    <div className="meta-box">
+                                        <PagesIcon size={18} />
+                                        <div>
+                                            <label>Pages</label>
+                                            <span>{selectedBook.pageCount}</span>
+                                        </div>
+                                    </div>
+                                    <div className="meta-box">
+                                        <BookIcon size={18} />
+                                        <div>
+                                            <label>ISBN</label>
+                                            <span>{selectedBook.isbn}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="details-description">
+                                    <h3>Description</h3>
+                                    <p>{selectedBook.description}</p>
+                                </div>
+
+                                <button
+                                    className="btn-primary full-width"
+                                    disabled={selectedBook.available === 0}
+                                    onClick={() => {
+                                        setShowDetailsModal(false);
+                                        setShowIssueModal(true);
+                                    }}
+                                >
+                                    <Plus size={18} /> Issue This Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-const BookContent = ({ book, onIssue }) => (
+const BookContent = ({ book, onIssue, onViewDetails }) => (
     <>
         <div className="book-cover">
             <img
@@ -275,13 +364,18 @@ const BookContent = ({ book, onIssue }) => (
                     {book.available} / {book.total} Available
                 </span>
             </div>
-            <button
-                className="issue-btn"
-                disabled={book.available === 0}
-                onClick={onIssue}
-            >
-                <Plus size={16} /> Issue Book
-            </button>
+            <div className="book-actions">
+                <button
+                    className="issue-btn"
+                    disabled={book.available === 0}
+                    onClick={onIssue}
+                >
+                    <Plus size={16} /> Issue
+                </button>
+                <button className="info-btn" onClick={onViewDetails}>
+                    <Info size={16} /> Details
+                </button>
+            </div>
         </div>
     </>
 );
