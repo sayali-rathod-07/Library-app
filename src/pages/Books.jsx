@@ -157,6 +157,10 @@ const Books = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > 1024 * 1024) {
+                showNotification('Image is too large. Please select an image under 1MB.', 'error');
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 setBookForm({ ...bookForm, thumbnail: reader.result });
@@ -335,7 +339,7 @@ const Books = () => {
                                 <p className="details-author">by {selectedBook.author}</p>
 
                                 <div className="details-tags">
-                                    {selectedBook.categories.map(cat => (
+                                    {selectedBook.categories?.map(cat => (
                                         <span key={cat} className="tag"><Tag size={14} /> {cat}</span>
                                     ))}
                                 </div>
